@@ -2,7 +2,7 @@
 #define WIDGET_H
 
 #include <QWidget>
-#include <QSystemTrayIcon>
+#include <QCloseEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -13,12 +13,13 @@ QT_END_NAMESPACE
 class Widget : public QWidget
 {
     Q_OBJECT
-private:
-    QSystemTrayIcon *trayIcon;
 
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
+
+private:
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::Widget *ui;

@@ -10,9 +10,11 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
+    trayicon.cpp \
     widget.cpp
 
 HEADERS += \
+    trayicon.h \
     widget.h
 
 FORMS += \
