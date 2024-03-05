@@ -23,5 +23,6 @@ private:
 
 private:
     Ui::Widget *ui;
+    bool haveTrayIcon;
 };
 #endif // WIDGET_H

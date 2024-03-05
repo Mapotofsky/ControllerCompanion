@@ -14,6 +14,7 @@ Widget::Widget(QWidget *parent)
     setWindowIcon(icon);
     setWindowTitle(tr("Controller Companion"));
 
+    haveTrayIcon = false;
     ui->setupUi(this);
 }
 
@@ -33,14 +34,18 @@ void Widget::closeEvent(QCloseEvent *event)
     //不关闭程序，最小化程序到托盘运行
     if(button == QMessageBox::Yes)
     {
-        //设置托盘所属的主窗体
-        TrayIcon::Instance()->setMainWidget(this);
+        if(!haveTrayIcon)
+        {
+            //设置托盘所属的主窗体
+            TrayIcon::Instance()->setMainWidget(this);
+            //设置托盘可见
+            TrayIcon::Instance()->setVisible(true);
+            haveTrayIcon = true;
+        }
         //忽略关闭事件
         event->ignore();
         //隐藏主窗口
         this->hide();
-        //设置托盘可见
-        TrayIcon::Instance()->setVisible(true);
         //设置提示消息，看不见消息的是电脑开启了勿扰模式
         TrayIcon::Instance()->showMessage("自定义最小化托盘",
                                           "已最小化");
