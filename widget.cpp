@@ -49,6 +49,7 @@ void Widget::closeEvent(QCloseEvent *event)
         //设置提示消息，看不见消息的是电脑开启了勿扰模式
         TrayIcon::Instance()->showMessage("自定义最小化托盘",
                                           "已最小化");
+        TrayIcon::Instance()->setToolTip("Controller Companion Plus");
     }
     //关闭程序
     else
