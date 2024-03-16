@@ -1,5 +1,7 @@
 QT       += core gui
 
+include ($$PWD/../QJoysticks-master/QJoysticks.pri)
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
