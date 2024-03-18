@@ -1,4 +1,6 @@
+#include <iostream>
 #include "trayicon.h"
+#include "widget.h"
 #include "qmutex.h"
 #include "qmenu.h"
 #include "qapplication.h"
@@ -36,7 +38,6 @@ TrayIcon::TrayIcon(QObject *parent) : QObject(parent)
     menu = new QMenu;
     // 实例化出来托盘菜单
     exitDirect = true;
-    m_joystick = QJoysticks::getInstance();
 }
 
 // 设置退出事件
@@ -55,7 +56,7 @@ void TrayIcon::setToolTip(const QString &tip)
 }
 
 // 定义设置所属的主窗体
-QJoysticks* TrayIcon::setMainWidget(QWidget *mainWidget)
+void TrayIcon::setMainWidget(QWidget *mainWidget)
 {
     this->mainWidget = mainWidget;
     // 给托盘加上菜单功能
@@ -70,8 +71,6 @@ QJoysticks* TrayIcon::setMainWidget(QWidget *mainWidget)
     }
     // 菜单绑定到右键
     trayIcon->setContextMenu(menu);
-
-    return m_joystick;
 }
 
 // 定义气泡显示信息

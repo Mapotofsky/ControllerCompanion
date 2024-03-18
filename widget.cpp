@@ -5,6 +5,8 @@
 #include "qmessagebox.h"
 #include "trayicon.h"
 
+Widget *globalMainWidget = nullptr;
+
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
@@ -18,6 +20,13 @@ Widget::Widget(QWidget *parent)
 
     haveTrayIcon = false;
     ui->setupUi(this);
+
+    // 获取手柄实例
+    m_joystick = QJoysticks::getInstance();
+    m_joystick->setVirtualJoystickEnabled(false);  // 禁用虚拟手柄
+    m_joystick->setVirtualJoystickRange(1);
+
+    globalMainWidget = this;
 }
 
 Widget::~Widget()
@@ -62,7 +71,7 @@ void Widget::closeEvent(QCloseEvent *event)
 
 void Widget::joystickAxisValue(int js_index, int axis_index, qreal value)
 {
-    if (w_joystick->joystickExists(js_index))
+    if (m_joystick->joystickExists(js_index))
     {
         value = std::round(value * 10000) / 100;
         std::cout << "axis index: " << axis_index << ", ";
@@ -101,7 +110,7 @@ void Widget::joystickAxisValue(int js_index, int axis_index, qreal value)
 
 void Widget::joystickButtonValue(int js_index, int button_index, bool pressed)
 {
-    if (w_joystick->joystickExists(js_index))
+    if (m_joystick->joystickExists(js_index))
     {
         std::cout << "button index: " << button_index << ", ";
         std::cout << "pressed: " << pressed << std::endl;
@@ -153,7 +162,7 @@ void Widget::joystickButtonValue(int js_index, int button_index, bool pressed)
 
 void Widget::joystickPovValue(int js_index, int pov_index, int angle)
 {
-    if (w_joystick->joystickExists(js_index))
+    if (m_joystick->joystickExists(js_index))
     {
         std::cout << "POV index: " << pov_index << ", ";
         std::cout << "angle: " << angle << std::endl;
@@ -199,7 +208,7 @@ void Widget::on_pushButtonStart_clicked()
     if(!haveTrayIcon)
     {
         //设置托盘所属的主窗体
-        w_joystick = TrayIcon::Instance()->setMainWidget(this);
+        TrayIcon::Instance()->setMainWidget(this);
         //设置托盘可见
         TrayIcon::Instance()->setVisible(true);
         haveTrayIcon = true;
@@ -207,17 +216,13 @@ void Widget::on_pushButtonStart_clicked()
         TrayIcon::Instance()->showMessage("自定义最小化托盘",
                                           "还没想好");
         TrayIcon::Instance()->setToolTip("Controller Companion Plus");
-
-        ui->pushButtonStart->setText("连接!");
     }
 
     // 要先创建托盘实例后才能拿到手柄信息
 
     // 看看有几个
     ui->comboBox->clear();
-    w_joystick->setVirtualJoystickEnabled(false);
-    w_joystick->setVirtualJoystickRange(1);
-    QStringList js_names = w_joystick->deviceNames();
+    QStringList js_names = m_joystick->deviceNames();
     foreach (QString name, js_names)
     {
         ui->comboBox->addItem(name);
@@ -225,25 +230,16 @@ void Widget::on_pushButtonStart_clicked()
 
     if (ui->comboBox->count())
     {
-        ui->pushButtonCheck->setEnabled(true);
-    }
-}
-
-void Widget::on_pushButtonCheck_clicked()
-{
-    std::cout << "clicked" << std::endl;
-    if (ui->comboBox->count())
-    {
         // 看看有没有
         ui->label_exist->clear();
-        ui->label_exist->setText((w_joystick->joystickExists(ui->comboBox->currentIndex()))?"True":"False");
+        ui->label_exist->setText((m_joystick->joystickExists(ui->comboBox->currentIndex()))?"True":"False");
 
         // 看看摇杆
-        connect(w_joystick, SIGNAL(axisChanged(int,int,qreal)), this, SLOT(joystickAxisValue(int,int,qreal)));
+        connect(m_joystick, SIGNAL(axisChanged(int,int,qreal)), this, SLOT(joystickAxisValue(int,int,qreal)));
         // 看看按钮
-        connect(w_joystick, SIGNAL(buttonChanged(int,int,bool)), this, SLOT(joystickButtonValue(int,int,bool)));
+        connect(m_joystick, SIGNAL(buttonChanged(int,int,bool)), this, SLOT(joystickButtonValue(int,int,bool)));
         // 看看十字键
-        connect(w_joystick, SIGNAL(povChanged(int,int,int)), this, SLOT(joystickPovValue(int,int,int)));
+        connect(m_joystick, SIGNAL(povChanged(int,int,int)), this, SLOT(joystickPovValue(int,int,int)));
     }
 }
 

@@ -19,7 +19,7 @@ private:
     Ui::Widget *ui;
     bool haveTrayIcon;
 public:
-    QJoysticks* w_joystick;
+    QJoysticks* m_joystick;
 
     // 成员函数
 public:
@@ -36,4 +36,7 @@ private slots:
     void on_pushButtonStart_clicked();
     void on_pushButtonCheck_clicked();
 };
+
+extern Widget *globalMainWidget;
+
 #endif // WIDGET_H
