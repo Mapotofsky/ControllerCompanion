@@ -6,7 +6,7 @@
 // 对静态成员变量self进行定义与初始化
 // QScopedPointer为智能指针，能自动管理内存，避免内存泄漏
 QScopedPointer<TrayIcon> TrayIcon::self;
-// 定义懒汉单例
+// 定义懒汉单例，确保只能有一个托盘
 TrayIcon* TrayIcon::Instance()
 {
     if(self.isNull())
@@ -36,6 +36,7 @@ TrayIcon::TrayIcon(QObject *parent) : QObject(parent)
     menu = new QMenu;
     // 实例化出来托盘菜单
     exitDirect = true;
+    m_joystick = QJoysticks::getInstance();
 }
 
 // 设置退出事件
@@ -54,7 +55,7 @@ void TrayIcon::setToolTip(const QString &tip)
 }
 
 // 定义设置所属的主窗体
-void TrayIcon::setMainWidget(QWidget *mainWidget)
+QJoysticks* TrayIcon::setMainWidget(QWidget *mainWidget)
 {
     this->mainWidget = mainWidget;
     // 给托盘加上菜单功能
@@ -63,13 +64,14 @@ void TrayIcon::setMainWidget(QWidget *mainWidget)
     if(exitDirect)
     {
         menu->addAction("退出", this, SLOT(closeAll()));
-    }
-    else
+    } else
     {
         menu->addAction("退出", this, SIGNAL(trayIconExit()));
     }
     // 菜单绑定到右键
     trayIcon->setContextMenu(menu);
+
+    return m_joystick;
 }
 
 // 定义气泡显示信息

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSystemTrayIcon>
+#include "QJoysticks.h"
 
 // 前向声明出来QMenu类
 class QMenu;
@@ -10,43 +11,40 @@ class QMenu;
 class TrayIcon : public QObject
 {
     Q_OBJECT
-public:
-    static TrayIcon* Instance();  // 声明单例
-    explicit TrayIcon(QObject *parent = nullptr);  // explicit防止隐式类型转换
+    // 成员变量
 private:
-    // 静态成员变量，用来持有TrayIcon类的唯一实例，实现单例
-    static QScopedPointer<TrayIcon> self;
-    // 维持所属的主窗体
-    QWidget* mainWidget;
-    // 维持右键托盘的菜单功能
-    QMenu* menu;
-    // 维持托盘对象
-    QSystemTrayIcon* trayIcon;
-    // 是否直接退出的标志位
-    bool exitDirect;
+    static QScopedPointer<TrayIcon> self;  // 静态成员变量，用来持有TrayIcon类的唯一实例，实现单例
+    QWidget* mainWidget;        // 维持所属的主窗体
+    QMenu* menu;                // 维持右键托盘的菜单功能
+    QSystemTrayIcon* trayIcon;  // 维持托盘对象
+    bool exitDirect;            // 是否直接退出的标志位
 public:
-    // 设置是否直接退出，不是发生信号给主界面
-    void setExitDirect(bool exitDirect);
-    // 设置提示信息
-    void setToolTip(const QString& tip);
-    // 声明所属的主窗体
-    void setMainWidget(QWidget* mainWidget);
-    // 声明显示消息
+    QJoysticks* m_joystick;
+
+    // 成员函数
+public:
+    static TrayIcon* Instance();              // 声明单例
+    explicit TrayIcon(QObject *parent = nullptr);    // explicit防止隐式类型转换
+    void setExitDirect(bool exitDirect);      // 设置是否直接退出，不是发生信号给主界面
+    void setToolTip(const QString& tip);      // 设置提示信息
+    QJoysticks* setMainWidget(QWidget* mainWidget);  // 声明所属的主窗体
     void showMessage(const QString& title,
                      const QString& msg,
                      QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information,
                      int msec = 5000
-                     );
+                     );                       // 声明显示消息
     // 对外获取和设置是否可见
     bool getVisible() const;
     void setVisible(bool visible);
+
+    // 槽函数
 public Q_SLOTS:
-    // 退出菜单
-    void closeAll();
-    // 显示主窗体的菜单
-    void showMainWidget();
+    void closeAll();        // 退出菜单
+    void showMainWidget();  // 显示主窗体的菜单
 private slots:
     void iconIsActived(QSystemTrayIcon::ActivationReason reason);
+
+    // 信号函数
 signals:
     void trayIconExit();
 };

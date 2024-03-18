@@ -1,3 +1,5 @@
+#include <cmath>
+#include <iostream>
 #include "widget.h"
 #include "./ui_widget.h"
 #include "qmessagebox.h"
@@ -57,3 +59,191 @@ void Widget::closeEvent(QCloseEvent *event)
         event->accept();
     }
 }
+
+void Widget::joystickAxisValue(int js_index, int axis_index, qreal value)
+{
+    if (w_joystick->joystickExists(js_index))
+    {
+        value = std::round(value * 10000) / 100;
+        std::cout << "axis index: " << axis_index << ", ";
+        std::cout << "value: " << value << std::endl;
+        switch (axis_index)
+        {
+        // 左摇杆 -左+右 [-1, 1] * 100
+        case 0:
+            ui->label_axis0->setText(QString::number(value));
+            break;
+        // 左摇杆 -上+下 [-1, 1] * 100
+        case 1:
+            ui->label_axis1->setText(QString::number(value));
+            break;
+        // 右摇杆 -左+右 [-1, 1] * 100
+        case 2:
+            ui->label_axis2->setText(QString::number(value));
+            break;
+        // 右摇杆 -上+下 [-1, 1] * 100
+        case 3:
+            ui->label_axis3->setText(QString::number(value));
+            break;
+        // LT [0, 1] * 100
+        case 4:
+            ui->label_axis4->setText(QString::number(value));
+            break;
+        // RT [0, 1] * 100
+        case 5:
+            ui->label_axis5->setText(QString::number(value));
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void Widget::joystickButtonValue(int js_index, int button_index, bool pressed)
+{
+    if (w_joystick->joystickExists(js_index))
+    {
+        std::cout << "button index: " << button_index << ", ";
+        std::cout << "pressed: " << pressed << std::endl;
+        switch (button_index)
+        {
+            // A
+        case 0:
+            ui->label_but0->setText(QString::number(pressed));
+            break;
+            // B
+        case 1:
+            ui->label_but1->setText(QString::number(pressed));
+            break;
+            // X
+        case 2:
+            ui->label_but2->setText(QString::number(pressed));
+            break;
+            // Y
+        case 3:
+            ui->label_but3->setText(QString::number(pressed));
+            break;
+            // LB
+        case 4:
+            ui->label_but4->setText(QString::number(pressed));
+            break;
+            // RB
+        case 5:
+            ui->label_but5->setText(QString::number(pressed));
+            break;
+        case 6:
+            ui->label_but6->setText(QString::number(pressed));
+            break;
+        case 7:
+            ui->label_but7->setText(QString::number(pressed));
+            break;
+            // LS
+        case 8:
+            ui->label_but8->setText(QString::number(pressed));
+            break;
+            // RS
+        case 9:
+            ui->label_but9->setText(QString::number(pressed));
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void Widget::joystickPovValue(int js_index, int pov_index, int angle)
+{
+    if (w_joystick->joystickExists(js_index))
+    {
+        std::cout << "POV index: " << pov_index << ", ";
+        std::cout << "angle: " << angle << std::endl;
+        if (pov_index == 0)
+        {
+            ui->label_pov0->setText(QString::number(angle));
+            switch (angle)
+            {
+            case 0:
+                ui->label_povd0->setText("↑");
+                break;
+            case 45:
+                ui->label_povd0->setText("↗");
+                break;
+            case 90:
+                ui->label_povd0->setText("→");
+                break;
+            case 135:
+                ui->label_povd0->setText("↘");
+                break;
+            case 180:
+                ui->label_povd0->setText("↓");
+                break;
+            case 225:
+                ui->label_povd0->setText("↙");
+                break;
+            case 270:
+                ui->label_povd0->setText("←");
+                break;
+            case 315:
+                ui->label_povd0->setText("↖");
+                break;
+            default:
+                ui->label_povd0->setText("");
+                break;
+            }
+        }
+    }
+}
+
+void Widget::on_pushButtonStart_clicked()
+{
+    if(!haveTrayIcon)
+    {
+        //设置托盘所属的主窗体
+        w_joystick = TrayIcon::Instance()->setMainWidget(this);
+        //设置托盘可见
+        TrayIcon::Instance()->setVisible(true);
+        haveTrayIcon = true;
+        //设置提示消息，看不见消息的是电脑开启了勿扰模式
+        TrayIcon::Instance()->showMessage("自定义最小化托盘",
+                                          "还没想好");
+        TrayIcon::Instance()->setToolTip("Controller Companion Plus");
+
+        ui->pushButtonStart->setText("连接!");
+    }
+
+    // 要先创建托盘实例后才能拿到手柄信息
+
+    // 看看有几个
+    ui->comboBox->clear();
+    w_joystick->setVirtualJoystickEnabled(false);
+    w_joystick->setVirtualJoystickRange(1);
+    QStringList js_names = w_joystick->deviceNames();
+    foreach (QString name, js_names)
+    {
+        ui->comboBox->addItem(name);
+    }
+
+    if (ui->comboBox->count())
+    {
+        ui->pushButtonCheck->setEnabled(true);
+    }
+}
+
+void Widget::on_pushButtonCheck_clicked()
+{
+    std::cout << "clicked" << std::endl;
+    if (ui->comboBox->count())
+    {
+        // 看看有没有
+        ui->label_exist->clear();
+        ui->label_exist->setText((w_joystick->joystickExists(ui->comboBox->currentIndex()))?"True":"False");
+
+        // 看看摇杆
+        connect(w_joystick, SIGNAL(axisChanged(int,int,qreal)), this, SLOT(joystickAxisValue(int,int,qreal)));
+        // 看看按钮
+        connect(w_joystick, SIGNAL(buttonChanged(int,int,bool)), this, SLOT(joystickButtonValue(int,int,bool)));
+        // 看看十字键
+        connect(w_joystick, SIGNAL(povChanged(int,int,int)), this, SLOT(joystickPovValue(int,int,int)));
+    }
+}
+

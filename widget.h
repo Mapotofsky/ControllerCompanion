@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QCloseEvent>
+#include "QJoysticks.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -13,16 +14,26 @@ QT_END_NAMESPACE
 class Widget : public QWidget
 {
     Q_OBJECT
-
-public:
-    Widget(QWidget *parent = nullptr);
-    ~Widget();
-
-private:
-    void closeEvent(QCloseEvent *event) override;
-
+    // 成员变量
 private:
     Ui::Widget *ui;
     bool haveTrayIcon;
+public:
+    QJoysticks* w_joystick;
+
+    // 成员函数
+public:
+    Widget(QWidget *parent = nullptr);
+    ~Widget();
+private:
+    void closeEvent(QCloseEvent *event) override;
+
+    // 槽函数
+private slots:
+    void joystickAxisValue(int js_index, int axis_index, qreal value);
+    void joystickButtonValue(int js_index, int button_index, bool pressed);
+    void joystickPovValue(int js_index, int pov_index, int angle);
+    void on_pushButtonStart_clicked();
+    void on_pushButtonCheck_clicked();
 };
 #endif // WIDGET_H
