@@ -1,6 +1,4 @@
-#include <iostream>
 #include "trayicon.h"
-#include "widget.h"
 #include "qmutex.h"
 #include "qmenu.h"
 #include "qapplication.h"
@@ -35,18 +33,8 @@ TrayIcon::TrayIcon(QObject *parent) : QObject(parent)
     // activated信号在托盘图标被用户操作时会触发，QSystemTrayIcon::ActivationReason是表示激活原因的枚举值
     connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this, SLOT(iconIsActived(QSystemTrayIcon::ActivationReason)));
-    menu = new QMenu;
     // 实例化出来托盘菜单
-    exitDirect = true;
-}
-
-// 设置退出事件
-void TrayIcon::setExitDirect(bool exitDirect)
-{
-    if(this->exitDirect != exitDirect)
-    {
-        this->exitDirect = exitDirect;
-    }
+    menu = new QMenu;
 }
 
 // 设置悬浮提示文本
@@ -62,13 +50,7 @@ void TrayIcon::setMainWidget(QWidget *mainWidget)
     // 给托盘加上菜单功能
     menu->addAction("主界面", this, SLOT(showMainWidget()));
     // 直接退出
-    if(exitDirect)
-    {
-        menu->addAction("退出", this, SLOT(closeAll()));
-    } else
-    {
-        menu->addAction("退出", this, SIGNAL(trayIconExit()));
-    }
+    menu->addAction("退出", this, SLOT(closeAll()));
     // 菜单绑定到右键
     trayIcon->setContextMenu(menu);
 }

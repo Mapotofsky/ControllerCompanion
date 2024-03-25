@@ -483,6 +483,9 @@
       <bold>false</bold>
      </font>
     </property>
+    <property name="editable">
+     <bool>false</bool>
+    </property>
    </widget>
    <widget class="QLabel" name="label_8">
     <property name="geometry">
@@ -500,7 +503,7 @@
      </font>
     </property>
     <property name="text">
-     <string>选择手柄：</string>
+     <string>手柄名称：</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">

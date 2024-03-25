@@ -16,13 +16,11 @@ private:
     QWidget* mainWidget;        // 维持所属的主窗体
     QMenu* menu;                // 维持右键托盘的菜单功能
     QSystemTrayIcon* trayIcon;  // 维持托盘对象
-    bool exitDirect;            // 是否直接退出的标志位
 
     // 成员函数
 public:
     static TrayIcon* Instance();              // 声明单例
     explicit TrayIcon(QObject *parent = nullptr);    // explicit防止隐式类型转换
-    void setExitDirect(bool exitDirect);      // 设置是否直接退出，不是发生信号给主界面
     void setToolTip(const QString& tip);      // 设置提示信息
     void setMainWidget(QWidget* mainWidget);  // 声明所属的主窗体
     void showMessage(const QString& title,

@@ -23,7 +23,7 @@ Widget::Widget(QWidget *parent)
 
     // 获取手柄实例
     m_joystick = QJoysticks::getInstance();
-    m_joystick->setVirtualJoystickEnabled(false);  // 禁用虚拟手柄
+    m_joystick->setVirtualJoystickEnabled(true);  // 虚拟手柄
     m_joystick->setVirtualJoystickRange(1);
 
     globalMainWidget = this;
@@ -71,7 +71,7 @@ void Widget::closeEvent(QCloseEvent *event)
 
 void Widget::joystickAxisValue(int js_index, int axis_index, qreal value)
 {
-    if (m_joystick->joystickExists(js_index))
+    if (m_joystick->joystickExists(js_index) && ui->comboBox->currentIndex() == js_index)
     {
         value = std::round(value * 10000) / 100;
         std::cout << "axis index: " << axis_index << ", ";
@@ -110,7 +110,7 @@ void Widget::joystickAxisValue(int js_index, int axis_index, qreal value)
 
 void Widget::joystickButtonValue(int js_index, int button_index, bool pressed)
 {
-    if (m_joystick->joystickExists(js_index))
+    if (m_joystick->joystickExists(js_index) && ui->comboBox->currentIndex() == js_index)
     {
         std::cout << "button index: " << button_index << ", ";
         std::cout << "pressed: " << pressed << std::endl;
@@ -162,7 +162,7 @@ void Widget::joystickButtonValue(int js_index, int button_index, bool pressed)
 
 void Widget::joystickPovValue(int js_index, int pov_index, int angle)
 {
-    if (m_joystick->joystickExists(js_index))
+    if (m_joystick->joystickExists(js_index) && ui->comboBox->currentIndex() == js_index)
     {
         std::cout << "POV index: " << pov_index << ", ";
         std::cout << "angle: " << angle << std::endl;
@@ -235,11 +235,14 @@ void Widget::on_pushButtonStart_clicked()
         ui->label_exist->setText((m_joystick->joystickExists(ui->comboBox->currentIndex()))?"True":"False");
 
         // 看看摇杆
-        connect(m_joystick, SIGNAL(axisChanged(int,int,qreal)), this, SLOT(joystickAxisValue(int,int,qreal)));
+        connect(m_joystick, SIGNAL(axisChanged(int,int,qreal)),
+                this, SLOT(joystickAxisValue(int,int,qreal)));
         // 看看按钮
-        connect(m_joystick, SIGNAL(buttonChanged(int,int,bool)), this, SLOT(joystickButtonValue(int,int,bool)));
+        connect(m_joystick, SIGNAL(buttonChanged(int,int,bool)),
+                this, SLOT(joystickButtonValue(int,int,bool)));
         // 看看十字键
-        connect(m_joystick, SIGNAL(povChanged(int,int,int)), this, SLOT(joystickPovValue(int,int,int)));
+        connect(m_joystick, SIGNAL(povChanged(int,int,int)),
+                this, SLOT(joystickPovValue(int,int,int)));
     }
 }
 

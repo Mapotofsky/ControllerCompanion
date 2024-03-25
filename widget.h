@@ -27,6 +27,16 @@ public:
     ~Widget();
 private:
     void closeEvent(QCloseEvent *event) override;
+protected:
+    void keyPressEvent(QKeyEvent *event) override {
+        // 不调用基类的keyPressEvent，从而忽略所有按键事件
+        // QWidget::keyPressEvent(event);
+    }
+
+    void keyReleaseEvent(QKeyEvent *event) override {
+        // 不调用基类的keyReleaseEvent，从而忽略所有按键事件
+        // QWidget::keyReleaseEvent(event);
+    }
 
     // 槽函数
 private slots:
@@ -34,7 +44,6 @@ private slots:
     void joystickButtonValue(int js_index, int button_index, bool pressed);
     void joystickPovValue(int js_index, int pov_index, int angle);
     void on_pushButtonStart_clicked();
-    void on_pushButtonCheck_clicked();
 };
 
 extern Widget *globalMainWidget;
